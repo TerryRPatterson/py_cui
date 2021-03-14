@@ -688,9 +688,22 @@ class MenuImplementation(UIImplementation):
 
         super().__init__(logger)
         self._top_view         = 0
-        self._selected_item    = 0
         self._page_scroll_len  = 5
         self._view_items       = []
+        self._select_listeners = []
+        self._selected_item    = 0
+
+
+    @property
+    def _selected_item(self):
+        return self.__selected_item
+
+
+    @_selected_item.setter
+    def _selected_item(self, new_item):
+        self.__selected_item = new_item
+        for listener in self._select_listeners:
+            listener(self._view_items[new_item])
 
 
     def clear(self):
@@ -898,6 +911,18 @@ class MenuImplementation(UIImplementation):
 
         if selected_item is not None and self.get() is not None:
             self._view_items[self._selected_item] = selected_item
+
+
+    def add_select_handler(self, select_handler):
+        """Function that adds a listener for selection events.
+
+        Parameters
+        ----------
+        select_handler: Callable[[selected_item]]
+        """
+
+        self._select_listeners.append(select_handler)
+
 
 
 class CheckBoxMenuImplementation(MenuImplementation):
